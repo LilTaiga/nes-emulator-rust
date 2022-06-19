@@ -1,3 +1,7 @@
-fn main() {
+mod cpu;
+mod bus;
+
+fn main()
+{
     println!("Hello, world!");
 }
