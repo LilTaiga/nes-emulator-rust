@@ -1,5 +1,11 @@
 use super::{CPU, addressing_modes::AddressMode, Flag};
 
+#[derive(Copy, Clone, Debug)]
+pub enum Opcode {
+    
+}
+
+
 impl CPU {
     pub fn call_operation(&mut self, opcode: Opcode) -> u8 {
         match opcode {
@@ -745,9 +751,4 @@ impl CPU {
     fn complete(&self) -> bool {
         self.remaining_cycles == 0
     }
-}
-
-#[derive(Copy, Clone, Debug)]
-pub enum Opcode {
-    
 }
