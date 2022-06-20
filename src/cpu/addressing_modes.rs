@@ -1,5 +1,22 @@
 use super::CPU;
 
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub enum AddressMode {
+    IMP,
+    IMM,
+    ZP0,
+    ZPX,
+    ZPY,
+    REL,
+    ABS,
+    ABX,
+    ABY,
+    IND,
+    IZX,
+    IZY,
+}
+
+
 impl CPU {
     pub fn call_addressing_mode(&mut self, address_mode: AddressMode) -> u8 {
         match address_mode {
@@ -166,20 +183,4 @@ impl CPU {
             0
         }
     }
-}
-
-#[derive(Copy, Clone, Debug, PartialEq)]
-pub enum AddressMode {
-    IMP,
-    IMM,
-    ZP0,
-    ZPX,
-    ZPY,
-    REL,
-    ABS,
-    ABX,
-    ABY,
-    IND,
-    IZX,
-    IZY,
 }

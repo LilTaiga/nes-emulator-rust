@@ -1,6 +1,11 @@
 use super::operations::Opcode;
 use super::addressing_modes::AddressMode;
 
+pub enum InstructionName {
+
+}
+
+
 pub(super) struct Instruction {
     pub name: InstructionName,
     pub operation: Opcode,
@@ -17,8 +22,4 @@ impl Instruction {
             number_cycles: todo!(),
         }; 256]
     }
-}
-
-pub enum InstructionName {
-
 }
