@@ -64,31 +64,84 @@ impl CPU
             let additional_cycle2 = self.call_operation(
                 self.instructions[self.opcode as usize].operation);
             
-            self.remaining_cycles += (additional_cycle1 & additional_cycle2);
+            self.remaining_cycles += additional_cycle1 & additional_cycle2;
 
         }
 
         self.remaining_cycles -= 1;
     }
 
-    pub fn reset() {
-        todo!()
+    pub fn reset(&mut self) {
+        self.address_absolute = 0xFFFC;
+        let lo = self.read(self.address_absolute + 0);
+        let hi = self.read(self.address_absolute + 1);
+
+        self.program_counter = ((hi as u16) << 8) | (lo as u16);
+        self.accumulator = 0;
+        self.register_x = 0;
+        self.register_y = 0;
+        self.stack_pointer = 0xFD;
+        self.status = 0x00 | (Flag::Unused as u8);
+
+        self.address_absolute = 0x0000;
+        self.address_relative = 0x0000;
+        self.fetched = 0x00;
+
+        self.remaining_cycles = 8;
     }
 
-    pub fn interrupt_request() {
-        todo!()
+    pub fn interrupt_request(&mut self) {
+        if self.get_flag(Flag::DisableInterrupt) == false {
+            self.write(0x0100 + self.stack_pointer as u16, (self.program_counter >> 8) as u8);
+            self.stack_pointer -= 1;
+            self.write(0x0100 + self.stack_pointer as u16, self.program_counter as u8);
+            self.stack_pointer -= 1;
+
+            self.set_flag(Flag::Break, false);
+            self.set_flag(Flag::Unused, true);
+            self.set_flag(Flag::DisableInterrupt, true);
+            self.write(0x100 + self.stack_pointer as u16, self.status);
+            self.stack_pointer -= 1;
+
+            self.address_absolute = 0xFFFE;
+            let lo = self.read(self.address_absolute + 0);
+            let hi = self.read(self.address_absolute + 1);
+            self.program_counter = ((hi as u16) << 8) | (lo as u16);
+
+            self.remaining_cycles = 7;
+        }
     }
 
-    pub fn non_maskable_interrupt() {
-        todo!()
+    pub fn non_maskable_interrupt(&mut self) {
+        self.write(0x0100 + self.stack_pointer as u16, (self.program_counter >> 8) as u8);
+        self.stack_pointer -= 1;
+        self.write(0x0100 + self.stack_pointer as u16, self.program_counter as u8);
+        self.stack_pointer -= 1;
+
+        self.set_flag(Flag::Break, false);
+        self.set_flag(Flag::Unused, true);
+        self.set_flag(Flag::DisableInterrupt, true);
+        self.write(0x100 + self.stack_pointer as u16, self.status);
+        self.stack_pointer -= 1;
+
+        self.address_absolute = 0xFFFA;
+        let lo = self.read(self.address_absolute + 0);
+        let hi = self.read(self.address_absolute + 1);
+        self.program_counter = ((hi as u16) << 8) | (lo as u16);
+
+        self.remaining_cycles = 8;
     }
 
     fn get_flag(&self, flag: Flag) -> bool {
-        todo!()
+        (self.status & (flag as u8)) != 0
     }
 
     fn set_flag(&mut self, flag: Flag, value: bool) {
-        todo!()
+        if value {
+            self.status |= flag as u8;
+        } else {
+            self.status &= !(flag as u8);
+        }
     }
 
 }
